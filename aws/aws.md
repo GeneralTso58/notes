@@ -10,7 +10,7 @@ When a
 - unlike users, roles are not an account you could sign in
 - based on trust policy, it is dynamically applied to a set of accounts and services and defines what they can access
 - roles provide temporary credentials and need to be renewed via AWS security token service. Temporary creds are always prefered over static long-term creds (e.g. I want to set up lambda to access Dynamo. If I give lambda a user, I risk leaking long-term creds. If I assign lambda roles, they only hold short-lived creds that are safer even if leaked)
-# Principals
+## Principals
 - they are human or workload that ath via IAM entity above. Roles get temporary creds, users get permanent creds.
 ## IAM policy
 defines access permissions
