@@ -18,3 +18,12 @@ defines access permissions
     - what resource can an identity access
 - resource based policy
     - what principles can access the resource
+# ECS
+## IAM task role
+Assumed by the application running inside the container to call AWS APIs
+## IAM execution role
+Assumed by the ECS orchestration agent to make calls to AWS services. e.g. pulling container imges from ECR or writing logs
+## launch types
+clusters can be created to be either EC2 or fargate
+- fargate is completely serverless. you submit task definitions and fargate spins up container for you.
+- with ec2 launch type, you need to manually mannage capacities by choosing the right number and sizes of ec2 instances on which ECS deploys containers. You also need to manually update EC2 softwares.
