@@ -48,7 +48,7 @@ The issue is there is only one CPU and when it runs user code via time sharing, 
 Solution: Run user code directly on CPU (for best performance), but set up the hardware environment such that 
 - when CPU runs user code, it is in user mode, and has limited access to resources
 - in order to perform system critical operations, it needs to make system calls, which
-    - saves regs into kernel stacks **how**
+    - saves regs into kernel stacks (**how?**)
     - calls trap with syscall_num to raise to kernel mode (start running OS code)
     - look up syscall_num in trap table to jump to the system call code to execute (running OS code in priviledged kernel mode to access resource)
     - returns from trap to go back to user mode
@@ -60,7 +60,7 @@ note we set up trap table at boot time in kernel mode
 ## set up
 workload types
 - short interactive workload
-    - low response time is the key
+    - low response time is key
     - yields frequently to do IO
 - long CPU-intense workload
 scheduling metrics
@@ -68,7 +68,7 @@ scheduling metrics
 - response time: time from job scheduled till the job first gets run
 - fariness
 ## shortest job first
-If all jobs arrive at the same time and job lengths are known, the optimal solution (**proof?**) for minimizing turnaround time is to run the shortest job first till completion and the second shortest job etc.
+If all jobs arrive at the same time and *job lengths are known*, the optimal solution (**proof?**) for minimizing turnaround time is to run the shortest job first till completion and the second shortest job etc.
 If jobs don't arrive at the same time, we use a variant called shortest time to completion first - every time a new job enters, the scheduler preempt and determines which remainig jobs are shortest to complete and do that first.
 ## round robin
 RR runs a job for time slice (multiple of timer-interrupt) and switch to the next and go around.
@@ -77,7 +77,25 @@ This approach is completely fair and good response time, but really bad tournaro
 Either being unfair and run the shortest job to completion first at the cost of response time
 Or use RR to lower response time at the cost of turnaround time
 ## I/O
-When a job issues an I/O, the task is blocked, we better overlap the CPU usage with another job to improve utilization. In a SJF system, we would treat each job segment before issuing I/O as a sub-job and schedule them independently.
+When a job issues an I/O, the task is blocked, we better overlap the CPU usage with another job to improve utilization. In a SJF system, we would treat each job segment before issuing I/O as a sub-job and schedule them independently. This makes sense bc the competion of a sub-job gives user feedback and is a job completion from user POV.
+## multi level feedback queue
+a number of distinct queues, each with a priority level
+uses job's historical performance to determine its scheduling policy
+Rules:
+- if Prio(A) > Prio(B), run A
+- if Prio(A) == Prio(B), run A and B in RR
+- when a job enters system, it is placed in highest prio
+- when job uses up allotment, its prio is reduced
+- if a job yields before allotment is up, its allotment is reset
+- after S period, move all jobs to top prio
+### discussion
+- rule 5 ensures interactive jobs (yield frequently) get prioritized and get good response time
+- rule 4 ensures we are able to identify CPU-intense long running jobs and run them in background
+- rule 3 assumes all jobs are short running first, and if the job is short running, it would be run to completion first, approximating SJF
+- rule 6 ensures the CPU doesn't just work on short interactive jobs and starve long running jobs. it is to boost fairness. It also ensures if a long-running job becomes interactive, it can be treated as interactive.
+- it is common to give high prio queues smaller time-slice
+- To prevent malicious programs from gaming the system via rule 5, we modify it to "Once a job uses up its allotment at a given level, regardless of how many yields, we reduce its prio". The trade off is it is possible some interactive process becomes less and less interactive.
+
 
 
 
