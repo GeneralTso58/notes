@@ -17,7 +17,7 @@ keep a copy of the same data on multiple machines that are connected via a netwo
 - increase read throughput
 **all of the difficulty in replication lies in handling changes to replicated data**
 ## leader follower
-leader determines the order by which writes should be processed. follower applies leader write in the same order
+leader determines the order by which writes should be processed. follower applies leader write in the same order. i.e. leader ensures total order broadcast by being the only node sending message (replication log) and using fifo broadcast algorithm.
 ### write to leader
 - synchronous
     - wait for writing to all followers
